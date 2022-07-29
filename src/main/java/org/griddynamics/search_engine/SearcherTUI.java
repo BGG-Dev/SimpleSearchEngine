@@ -1,5 +1,10 @@
 package org.griddynamics.search_engine;
 
+import org.griddynamics.search_engine.searcher.Searcher;
+import org.griddynamics.search_engine.searcher.SearcherAll;
+import org.griddynamics.search_engine.searcher.SearcherAny;
+import org.griddynamics.search_engine.searcher.SearcherNone;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.LinkedList;
@@ -7,9 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
-/**
- * Implements TUI for Searcher class
- */
 public class SearcherTUI {
 
     // Private static stdin scanner
@@ -21,9 +23,6 @@ public class SearcherTUI {
     public static void menu(File data) {
         // Getting people
         Person[] people = readPeopleFromFile(data);
-
-        // Getting string -> Person[] map
-        Map<String, Person[]> map = Searcher.createStringToPersonArrayMap(people);
 
         // Menu cycle
         String userDecision;
@@ -38,9 +37,11 @@ public class SearcherTUI {
             userDecision = scanIn.nextLine();
 
             // Switching
+            Searcher searcher;
             switch (userDecision) {
                 case "1":
-                    searchByKeyword(map);
+                    searcher = createSearcherBasedOnUserCommand(people);
+                    searchByQuery(searcher);
                     break;
                 case "2":
                     printPeople(people);
@@ -57,7 +58,7 @@ public class SearcherTUI {
     /**
      * Reads people from given file
      * @param data | File instance to read from
-     * @return Array of Person, loaded from file
+     * @return Array of search.Person, loaded from file
      */
     private static Person[] readPeopleFromFile(File data) {
         // Linked list to store people
@@ -81,29 +82,40 @@ public class SearcherTUI {
         return people.toArray(Person[]::new);
     }
 
-    /**
-     * Prints persons in array
-     * @param people | Array of Person to print
-     */
-    private static void printPeople(Person[] people) {
-        System.out.println("\n=== List of people ===");
-        for (Person current : people) {
-            System.out.println(current.toString());
+    private static Searcher createSearcherBasedOnUserCommand(Person[] people) {
+        while (true) {
+            // Requesting command
+            System.out.println("\nSelect a matching strategy: ALL, ANY, NONE");
+
+            // Getting input
+            String command = scanIn.nextLine();
+
+            // Switching
+            switch (command) {
+                case "ALL":
+                    return new SearcherAll(people);
+                case "ANY":
+                    return new SearcherAny(people);
+                case "NONE":
+                    return new SearcherNone(people);
+                default:
+                    System.out.println("\nIncorrect option! Try again.");
+            }
         }
     }
 
     /**
-     * TUI for searchByKeyword method
+     * TUI for searchByQuery method
      */
-    private static void searchByKeyword(Map<String, Person[]> map) {
-        // Asking to enter a keyword
+    private static void searchByQuery(Searcher searcher) {
+        // Asking to enter a query
         System.out.println("\nEnter a name or email to search all suitable people.");
 
-        // Reading keyword
-        String keyword = scanIn.nextLine();
+        // Reading query
+        String query = scanIn.nextLine();
 
         // Processing query
-        Person[] result = Searcher.searchByKeyword(map, keyword);
+        Person[] result = searcher.searchByQuery(query);
 
         // Printing result
         if (result == null) {
@@ -117,24 +129,13 @@ public class SearcherTUI {
     }
 
     /**
-     * Gets people with data, given by user
-     * @return array of Person
+     * Prints persons in array
+     * @param people | Array of search.Person to print
      */
-    private static Person[] getPeopleFromUser() {
-        // Asking to enter people amount
-        System.out.println("Enter the number of people:");
-
-        // Reading amount of people
-        int peopleAmount = Integer.parseInt(scanIn.nextLine());
-
-        // Reading people
-        System.out.println("Enter all people:");
-        Person[] people = new Person[peopleAmount];
-        for (int i = 0; i < peopleAmount; i++) {
-            people[i] = Person.parsePerson(scanIn.nextLine());
+    private static void printPeople(Person[] people) {
+        System.out.println("\n=== List of people ===");
+        for (Person current : people) {
+            System.out.println(current.toString());
         }
-
-        // Returning
-        return people;
     }
 }
