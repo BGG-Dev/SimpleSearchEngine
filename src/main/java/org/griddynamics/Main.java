@@ -23,5 +23,5 @@ public class Main {
 
         // Calling menu
         SearcherTUI.menu(data);
-    }    
+    }
 }

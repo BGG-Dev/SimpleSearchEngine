@@ -1,5 +1,6 @@
 package org.griddynamics.search_engine;
 
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -77,6 +78,14 @@ public class Person {
     }
 
     /**
+     * info getter
+     * @return person's info as String array
+     */
+    public String[] getInfo() {
+        return new String[] { firstName, lastName, email };
+    }
+
+    /**
      * toString overriding
      */
     @Override
@@ -119,9 +128,7 @@ public class Person {
         }
 
         // Checking for Person equality
-        return (this.firstName.equals(other.firstName)) &&
-               (this.lastName.equals(other.lastName))   &&
-               (this.email.equals(other.email));
+        return Arrays.equals(this.getInfo(), other.getInfo());
     }
 
     /**
@@ -130,9 +137,9 @@ public class Person {
     @Override
     public int hashCode() {
         int hash = 47;
-        hash = 83 * hash + (this.firstName != null ? this.firstName.hashCode() : 0);
-        hash = 83 * hash + (this.lastName != null ? this.lastName.hashCode() : 0);
-        hash = 83 * hash + (this.email != null ? this.email.hashCode() : 0);
+        for (String current : this.getInfo()) {
+            hash += 83 * hash + (current != null ? current.hashCode() : 0);
+        }
         return hash;
     }
 

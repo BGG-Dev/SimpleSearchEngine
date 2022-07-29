@@ -1,25 +1,25 @@
 package search_engine;
 
 import org.griddynamics.search_engine.Person;
-import org.griddynamics.search_engine.Searcher;
+import org.griddynamics.search_engine.searcher.Searcher;
+import org.griddynamics.search_engine.searcher.SearcherAny;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
- * Searcher class tests
+ * SearcherAny class tests
  */
-public class SearcherTest {
+public class SearcherAnyTest {
 
-    // str -> Person[] map
-    private Map<String, Person[]> peopleMap;
+    // Searcher reference
+    private Searcher searcher;
 
     /**
-     * Initializes people array
+     * Initializes searcher
      */
     @BeforeEach
     private void initializePeople() {
@@ -35,13 +35,13 @@ public class SearcherTest {
         people[5] = new Person("Erick", "Burgess", "");
 
         // Creating map based on people
-        peopleMap = Searcher.createStringToPersonArrayMap(people);
+        searcher = new SearcherAny(people);
     }
 
     @Test
-    void erickTest() {
+    void erickAnyTest() {
         // Searching by keyword
-        Person[] result = Searcher.searchByKeyword(peopleMap, "Erick");
+        Person[] result = searcher.searchByQuery("Erick");
 
         // Asserting
         assertEquals(2, result.length);
@@ -50,18 +50,18 @@ public class SearcherTest {
     }
 
     @Test
-    void noMatchTest() {
+    void noMatchAnyTest() {
         // Searching by keyword
-        Person[] result = Searcher.searchByKeyword(peopleMap, "there is no me in there");
+        Person[] result = searcher.searchByQuery("there is no me in there");
 
         // Asserting
-        assertNull(result);
+        assertEquals(0, result.length);
     }
 
     @Test
-    void webbTest() {
+    void webbAnyTest() {
         // Searching by keyword
-        Person[] result = Searcher.searchByKeyword(peopleMap, "webb@gmail.com");
+        Person[] result = searcher.searchByQuery("webb@gmail.com");
 
         // Asserting
         assertEquals(1, result.length);
